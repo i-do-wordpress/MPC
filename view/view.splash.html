@@ -1,14 +1,28 @@
+
+
 <div class="container">
       
     <div id="splash">
+      
+      <div class="row">
+        <div class="col-xs-12 col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6">
+          <div class="alert alert-info" ng-if="CR.loginErr">
+            <strong><i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+            </strong> Unfortunatelly login unsuccessful. Try again.
+          </div>
+        </div>  
+      </div>  
+      
+      
       <div class="row">
         <div class="col-xs-12 col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6">
           <div class="well well-lg clearfix">
-          
-            <form method="post" name="pixelAuthForm" ng-submit="CR.auth(pixelAuthForm)" novalidate>
+            
+            <form name="pixelAuthForm" ng-submit="CR.auth(pixelAuthForm)" novalidate>
+              
               <div class="form-group">
                 
-                <input type="text" class="form-control" id="pass" placeholder="Hello Pixel. You know what to do." ng-model="CR.pixel.pass" required>
+                <input type="text" class="form-control" id="pass" placeholder="Hello Pixel. You know what to do." ng-model="CR.pixel.PIN" required>
               
               </div>
               
@@ -22,10 +36,8 @@
               </button>
             
             
-            
             </form>
             
-            {{pixelAuthForm.$valid}}
             
           </div>
         </div>

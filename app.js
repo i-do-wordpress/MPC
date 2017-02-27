@@ -6,7 +6,7 @@
       
       
       
-      //ng include issue / closure
+      /* fixes ng include issue + closure */
       var preloader = function(){
         var stop = setInterval(function(){
           var text = angular.element(document).find('#lessIsMoreText');
@@ -22,6 +22,7 @@
             });
           }
           */
+          
           if(text.length && view.length && wrapper.length){
             text.fadeIn(3).delay(2).fadeOut(1);
             wrapper.delay(5).fadeOut(2, function(){
@@ -47,14 +48,15 @@
       
       
       
-    }
+    }//end window.onload
     
     
     
+  /*-----------------------config, routes-----------------------------------------------*/    
     
     
+    var pix = angular.module('pix', ['ngRoute', 'ngCookies']);
     
-    var pix = angular.module('pix', ['ngRoute']);
     
     
     
@@ -62,16 +64,30 @@
     pix
       
       .config(['$routeProvider', function($routeProvider){
+        
         $routeProvider
           
           .when('/', {
             templateUrl: 'view/view.splash.html',
             //controller: 'CtrlSplash',
-            //controllerAs: 'CS'
+            //controllerAs: 'CS',
+            middlewares: ['guest'],
           })
+          .when('/home', {
+            templateUrl: 'view/view.home.html',
+            //controller: 'CtrlSplash',
+            //controllerAs: 'CS'
+            middlewares: ['auth']
+          })
+
           
+
           .otherwise({redirectTo: '/'});
       }]);
+      
+      
+      
+       
       
       
       
@@ -83,47 +99,134 @@
       
       
       
+      pix.config(['$httpProvider', function($httpProvider){
+        
+        $httpProvider.defaults.useXDomain = true;
+        delete $httpProvider.defaults.headers.common['X-Requested-With'];
+        
+        
+        $httpProvider.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+        
+      }]);
       
       
+      
+      //factory in run thus no need to ctrl     
+      pix.run(['$rootScope', '$location', 'factoryRoot',
+        function($rootScope, $location, factoryRoot){
+          
+          $rootScope.$on('$routeChangeStart', function(event, next, current){
+            
+            if(next.$$route){
+            
+              var ms = next.$$route.middlewares;
+            
+              if(ms.length){
+                for(var i=0, len=ms.length; i<len; i++){
+                
+                  if(ms[i]==='auth'){
+
+                    if(!factoryRoot.canGo()){
+                      $location.path('/');
+                    }else{
+                      //$location.path(next.$$route.originalPath); //no need
+                    }
+                  }else if(ms[i]==='guest'){
+                    if(factoryRoot.canGo()){
+                      $location.path('/home');
+                    }
+                  }  
+                
+                }
+              }
+            
+            }  
+          
+            
+          });
+        }
+      ]);
+      
+      
+      
+      
+      
+      
+      
+      
+  /*--------------------------------end config, routes--------------------------------------------*/    
+      
+      
+      
+      
+      
+      
+      
+      
+  /*---------------------------------------CTRLs------------------------------------------------------*/    
       
       pix.controller('CtrlRoot', CtrlRoot);
       
-      CtrlRoot.$inject = ['$http'];
+      CtrlRoot.$inject = ['$http', '$cookies', 'factoryRoot', '$timeout', '$location'];
       
-      function CtrlRoot($http){
+      function CtrlRoot($http, $cookies, factoryRoot, $timeout, $location){
         
         var self = this;
         
+        self.factoryRoot = factoryRoot;
         self.checking = false;
-        
+        self.loginErr = false;
         self.pixel = {};
-        self.pixel.pass = '';
+        self.pixel.PIN = '';
+        
+        //no need to follow and cancel
+        var setLoginErr = function(){
+          self.loginErr = true;
+          $timeout(function(){
+            self.loginErr = false;
+          }, 3000);
+        };
+        
+        
         
         self.auth = function(form){
-          
-          if(form.$valid && self.pixel.pass){
+          self.checking = true;
+          self.loginErr = false;
+          if(form.$valid && self.pixel.PIN){
             
-            self.checking = true;
-            
-            $http.post("https://useless-space.comli.com/auth.php", self.pixel.pass).then(function(response){
-              
-              console.log(response);
-              
-              
-            }, function(response){
-              
-              console.log(response);
-              
+            //checking details vs dummy data endpoint
+            $http.get("http://jsonplaceholder.typicode.com/comments/"+self.pixel.PIN+"")
+              .then(function(response){
+                self.checking = false;
+                var bit = response.data.body;  
+                var logged = factoryRoot.login(bit);
+                if(!logged){
+                  setLoginErr();
+                  return false;
+                }else{
+                  //console.log($location.path('/home'));
+                  $location.path('/home');
+                  return true;
+                }
+              }, function(response){
+                  self.checking = false;
+                  setLoginErr();
+                  return false;
             });
-            
-            
-            
+          }else{
+            self.checking = false;
+            setLoginErr();
+            return false; 
           }
-        }
+        }//end self.auth
         
+
         
-        
-        
+        self.logout = function(){
+          factoryRoot.logout();
+          $location.path('/');
+        };
+      
         
         
         
@@ -133,6 +236,97 @@
       
 
     
+  /*--------------------------------end CTRLs-----------------------------------------------*/  
+    
+    
+  
+  
+  
+  
+  
+  
+    
+    
+    
+  /*-------------------------------------factory-------------------------------------------------------*/  
+  pix.factory('factoryRoot', factoryRoot);
+  
+  factoryRoot.$inject = ['$cookies'];
+  
+  function factoryRoot($cookies){
+    
+    var root = {};
+    
+    //root.go = false;
+    //root.cookies = [];
+
+    //is Logged
+    root.canGo = function(){
+      return  $cookies.get('go') ? true : false;
+    };
+    
+    
+    root.login = function(bit){
+      if(bit.charAt(150) === "i" && bit.charAt(12) === 'o'){
+        var cook = $cookies.get('go');
+        if(!cook){
+          $cookies.put('go', true);
+        }
+        return true;
+      }else{
+        return false;
+      }  
+    };
+    
+    
+    root.logout = function(){
+      root.removeAllCookies();
+    };
+    
+    
+    
+    root.removeAllCookies = function(){
+      var c = $cookies.getAll();
+      if(c){
+        angular.forEach(c, function (v, k){
+          $cookies.remove(k);
+        });
+      }
+    };
+    
+    
+    //keep one line
+    //put some watch?
+    
+    
+    return root;
+    
+  }//end rootFactory
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  /*---------------------------------end factory-------------------------------------------------------*/  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  /*----------------------------------------------------------------------------------------*/  
+  /*----------------------------------------------------------------------------------------*/  
     
     
     
@@ -143,9 +337,4 @@
     
     
     
-    
-    
-    
-    
-    
-})();
+})();//end iffe
