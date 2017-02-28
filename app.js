@@ -55,7 +55,7 @@
   /*-----------------------config, routes-----------------------------------------------*/    
     
     
-    var pix = angular.module('pix', ['ngRoute', 'ngCookies']);
+    var pix = angular.module('pix', ['ngRoute', 'ngCookies', 'ngTouch']);
     
     
     
@@ -117,10 +117,8 @@
           
           $rootScope.$on('$routeChangeStart', function(event, next, current){
             
-            if(next.$$route){
-            
+            if(next.$$route && !next.$$route.redirectTo && next.$$route.middlewares){
               var ms = next.$$route.middlewares;
-            
               if(ms.length){
                 for(var i=0, len=ms.length; i<len; i++){
                 
@@ -226,8 +224,22 @@
           self.pixel.PIN = '';
           factoryRoot.logout();
           $location.path('/');
+          
+          //some-mobile-incognito-mode-browzers fix
+          //if stuck on logout
+          //force redirect if cookie removed
+          if(window.location.hash !== '#/'){
+            window.location.hash = '#/';
+          }  
         };
       
+        
+        
+        
+        self.toggleBio = function(){
+          angular.element(document).find('#bio').slideToggle(300);
+        };
+        
         
         
         

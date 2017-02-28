@@ -1,11 +1,220 @@
 
 
 <div class="container">
+    
     <div class="row">
         <div class="col-xs-12">
-          <a class="btn btn-link pull-right" ng-click="CR.logout()">Logout <i class="fa fa-power-off" aria-hidden="true"></i></a>
+          
+          
+          <!--a href="javascript:void(0)" class="btn btn-link pull-right" ng-click="CR.logout()" ng-tap="CR.logout()" ng-touchstart="CR.logout()">Logout <i class="fa fa-power-off" aria-hidden="true" target="_self"></i>
+          </a-->
+          <!-- or -->
+          <button type="button" class="btn btn-link pull-right" ng-click="CR.logout()" ng-tap="CR.logout()">Logout 
+            <i class="fa fa-power-off" aria-hidden="true"></i>
+          </button>
+          
+          <br>
           <h3>You are in.</h3>
+  
+          <br>
+          <br>
             
         </div>
     </div>
+    
+    
+    
+    <div class="well clearfix">
+      <div class="row">
+        
+        <div class="col-xs-12 col-sm-5">
+          <p>solution files_list</p>
+          <p>
+            <a class="btn btn-info btn-xs" href="http://useless-space.hol.es/mpc/files-list.php" target="_blank">
+              <i class="fa fa-wifi" aria-hidden="true"></i>&nbsp;&nbsp;live demo
+            </a>
+          </p>
+          <!--link target blank separate repository clone mpc solutions 2 xphp file 1 repository-->
+          <p>
+            <a class="btn btn-default btn-xs">
+              <i class="fa fa-file-code-o" aria-hidden="true"></i>&nbsp;&nbsp;src
+            </a>
+          </p>
+        </div>
+        
+        <div class="col-xs-12 col-sm-5">
+          <p>solution tiles_filters</p>
+          <p>
+            <a class="btn btn-info btn-xs" href="https://o2.pl" target="_blank">
+              <i class="fa fa-wifi" aria-hidden="true"></i>&nbsp;&nbsp;live demo
+            </a>
+          </p>
+          <p>
+            <a class="btn btn-default btn-xs">
+              <i class="fa fa-file-code-o" aria-hidden="true" href="/github.com/src" target="_blank"></i>&nbsp;&nbsp;src
+            </a>
+          </p>
+        </div>
+      
+        <!--new route, back to home or slide in! ng include-->
+        <div class="col-xs-12 col-sm-2">
+          <p>hire me</p>
+          <p>
+            <button type="button" class="btn btn-default btn-xs" ng-click="CR.toggleBio()">
+              <i class="fa fa-user-o" aria-hidden="true"></i>&nbsp;&nbsp;bio
+            </button>
+          </p>  
+        </div>
+      
+      
+      </div>
+    </div>
+    
+    
+    <style>
+      .chart div{
+        padding: 5px;
+        font-size: 8px;
+        color: white;
+        background:#34495e;
+        height:30px;
+        line-height: 20px; /* h - 2*padding*/
+        margin-bottom: 8px;
+      }
+      div.bench{
+        padding: 5px;
+        font-size: 8px;
+        color: white;
+        height:30px;
+        line-height: 20px; /* h - 2*padding*/
+        width:100%;
+        background:#9b59b6;
+      }
+      
+      @media only screen and (min-width : 360px){
+        
+        .chart div{
+          padding: 5px;
+          font-size: 10px;
+          color: white;
+          background:#34495e;
+          height:30px;
+          line-height: 20px; /* h - 2*padding*/
+          margin-bottom: 8px;
+        }
+        
+        div.bench{
+          padding: 5px;
+          font-size: 10px;
+          color: white;
+          height:30px;
+          line-height: 20px; /* h - 2*padding*/
+          width:100%;
+          background:#9b59b6;
+        } 
+         
+      }
+      
+      @media only screen and (min-width : 480px){
+        
+        .chart div{
+          padding: 5px;
+          font-size: 12px;
+          color: white;
+          background:#34495e;
+          height:30px;
+          line-height: 20px; /* h - 2*padding*/
+          margin-bottom: 8px;
+        }
+        
+        div.bench{
+          padding: 5px;
+          font-size: 12px;
+          color: white;
+          height:30px;
+          line-height: 20px; /* h - 2*padding*/
+          width:100%;
+          background:#9b59b6;
+        } 
+         
+      }
+      
+      
+    </style>
+    
+    <!--later include pure sql, raw php-->
+    <div class="well clearfix" id="bio" style="display:none;">
+      
+      <div class="row">
+        
+        <div class="col-xs-12 col-sm-offset-1 col-sm-10 chart">
+            
+            <div style="width:40%;">JavaScript Vanilla</div>
+            
+            <div style="width:35%;">Angular 1.X</div>
+            
+            <div style="width:34%;">Laravel 5.X</div>
+            
+            <div style="width:33%;">jQuery</div>
+            
+            <div style="width:32%;">Bootstrap 3.X</div>
+            
+            <div style="width:30%;">AJAX REST</div>
+            
+            <div style="width:30%;">RWD OOP</div>
+            
+            <div style="width:28%;">Wordpress</div>
+            
+            <div style="width:25%;">CodeIgniter</div>
+            
+            <div style="width:20%;">PHP 5.X</div><!--Pure-->
+            
+            <div style="width:18%;">Ionic</div>
+            
+            <div style="width:15%;">SQL</div><!--Raw-->
+            
+            <div style="width:14%;">Git</div>
+            
+            <div style="width:13%;">Java</div>
+            
+            <div style="width:13%;">Sass</div>
+            
+            <div style="width:13%;">Less</div>
+        </div>
+        
+        <div class="col-xs-12 col-sm-offset-1 col-sm-10">
+          <div class="bench">
+            <div class="col-xs-4 text-left">poor</div> 
+            <div class="col-xs-4 text-center"><strong>benchmark</strong></div>
+            <div class="col-xs-4 text-right">excellent</div>
+          </div>
+        </div>  
+      
+      </div><!--/row-->      
+      <br>
+      <br>
+      <div class="row">      
+         <div class="col-xs-12 col-sm-offset-1 col-sm-10">
+          <p><strong>Laravel, angular, javascript, bootstrap, jQ</strong> - fav & ready to go.</p>
+          <p><strong>Wordpress</strong> old, good friend, need to be refreshed. Bit messy and akward but genuine and keeping it real. My first CMS learned a couple years ago. Unfortunatelly, abandoned after I discovered <strong>CodeIgniter</strong> and shortly after that, when a concise elegance of <strong>Laravel</strong> with its transparent routing, migrations, auth system and other well-crafted features came into play.
+          </p>
+          <p>Fundamental <strong>Ionic</strong> liked it big time, will get to know it better. As well as <strong>Vue.js</strong></p>
+          <p>Rough, general, superficial, rudymentary understanding of other stuff.</p>
+          
+
+        </div>    
+            
+      </div><!--/row-->  
+    
+    </div><!--/well bio-->  
+  
 </div><!--/container-->
+
+
+
+
+
+
+
+
+
