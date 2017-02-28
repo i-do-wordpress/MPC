@@ -204,7 +204,7 @@
                   setLoginErr();
                   return false;
                 }else{
-                  //console.log($location.path('/home'));
+                  //self.pixel.PIN = '';
                   $location.path('/home');
                   return true;
                 }
@@ -223,6 +223,7 @@
 
         
         self.logout = function(){
+          self.pixel.PIN = '';
           factoryRoot.logout();
           $location.path('/');
         };
