@@ -5,7 +5,6 @@
     window.onload = function(){
       
       
-      
       /* fixes ng include issue + closure */
       var preloader = function(){
         var stop = setInterval(function(){
@@ -71,16 +70,15 @@
             templateUrl: 'view/view.splash.html',
             //controller: 'CtrlSplash',
             //controllerAs: 'CS',
-            middlewares: ['guest'],
+            middlewares: ['guest']
           })
+          
           .when('/home', {
             templateUrl: 'view/view.home.html',
             //controller: 'CtrlSplash',
             //controllerAs: 'CS'
             middlewares: ['auth']
           })
-
-          
 
           .otherwise({redirectTo: '/'});
       }]);
@@ -112,10 +110,12 @@
       
       
       //factory in run thus no need to ctrl     
-      pix.run(['$rootScope', '$location', 'factoryRoot',
-        function($rootScope, $location, factoryRoot){
+      pix.run(['$rootScope', '$location', 'factoryRoot', '$cookies', '$window',
+        function($rootScope, $location, factoryRoot, $cookies, $window){
           
-          $rootScope.$on('$routeChangeStart', function(event, next, current){
+          $rootScope.$on('$routeChangeStart', function(event,next,current){
+            
+            var isLogged = factoryRoot.isLogged();
             
             if(next.$$route && !next.$$route.redirectTo && next.$$route.middlewares){
               var ms = next.$$route.middlewares;
@@ -124,30 +124,22 @@
                 
                   if(ms[i]==='auth'){
 
-                    if(!factoryRoot.canGo()){
+                    if(!isLogged){
                       $location.path('/');
                     }else{
                       //$location.path(next.$$route.originalPath); //no need
                     }
                   }else if(ms[i]==='guest'){
-                    if(factoryRoot.canGo()){
-                      $location.path('/home');
+                    if(isLogged){
+                      $location.path('/home'); //or other next/intended
                     }
                   }  
-                
                 }
               }
-            
-            }  
-          
-            
+            }
           });
-        }
-      ]);
-      
-      
-      
-      
+        }  
+      ]); //end run
       
       
       
@@ -165,9 +157,15 @@
       
       pix.controller('CtrlRoot', CtrlRoot);
       
-      CtrlRoot.$inject = ['$http', '$cookies', 'factoryRoot', '$timeout', '$location'];
+      CtrlRoot.$inject = ['$http', '$cookies', 'factoryRoot', '$timeout', '$location', '$window'];
       
-      function CtrlRoot($http, $cookies, factoryRoot, $timeout, $location){
+      function CtrlRoot($http, $cookies, factoryRoot, $timeout, $location, $window){
+        
+        //console.log('$location',$location.$$absUrl);
+        //console.log(window.location.origin+window.location.pathname);
+        //if(!window.location.origin){
+          //window.location.origin = window.location.protocol + "//" + window.location.host;
+        //}  
         
         var self = this;
         
@@ -176,6 +174,9 @@
         self.loginErr = false;
         self.pixel = {};
         self.pixel.PIN = '';
+        self.isMobile = factoryRoot.isMobile();
+        self.baseUrl = factoryRoot.getBaseUrl();
+        self.pathName = factoryRoot.getPathName();
         
         //no need to follow and cancel
         var setLoginErr = function(){
@@ -186,24 +187,36 @@
         };
         
         
-        
         self.auth = function(form){
           self.checking = true;
           self.loginErr = false;
           if(form.$valid && self.pixel.PIN){
             
-            //checking details vs dummy data endpoint
+            /*checking details dummy data endpoint ajax call
+            normally should also be POST not GET
+            */
             $http.get("http://jsonplaceholder.typicode.com/comments/"+self.pixel.PIN+"")
               .then(function(response){
                 self.checking = false;
                 var bit = response.data.body;  
-                var logged = factoryRoot.login(bit);
-                if(!logged){
+                var pinOk = factoryRoot.checkPin(bit);
+                if(!pinOk){
                   setLoginErr();
                   return false;
                 }else{
-                  //self.pixel.PIN = '';
+                  //self.pixel.PIN = ''; //on logout, stops flickering
+                  $window.sessionStorage.setItem('go', '_someTokenFromRest');
                   $location.path('/home');
+                  
+                  //also ok
+                  //$window.localStorage.setItem('storage',true);
+                  
+                  //note:
+                  //$cookie tested vs mobile browsers failed big time!
+                  //especially when incognito mode was on
+                  //sessionStorage seems bulletproof
+                  //$window.sessionStorage.setItem("sessionstorage", angular.toJson(session));
+                  
                   return true;
                 }
               }, function(response){
@@ -223,19 +236,13 @@
         self.logout = function(){
           self.pixel.PIN = '';
           factoryRoot.logout();
-          $location.path('/');
-          
-          //some-mobile-incognito-mode-browzers fix
-          //if stuck on logout
-          //force redirect if cookie removed
-          if(window.location.hash !== '#/'){
-            window.location.hash = '#/';
-          }  
+          $window.location.replace(self.pathName); //reload & no history
+          //$location.path('/');
+          //$window.location.reload(); 
+          //window.close();
         };
       
-        
-        
-        
+    
         self.toggleBio = function(){
           angular.element(document).find('#bio').slideToggle(300);
         };
@@ -264,27 +271,19 @@
   /*-------------------------------------factory-------------------------------------------------------*/  
   pix.factory('factoryRoot', factoryRoot);
   
-  factoryRoot.$inject = ['$cookies'];
+  factoryRoot.$inject = ['$cookies', '$window', '$location'];
   
-  function factoryRoot($cookies){
+  function factoryRoot($cookies, $window, $location){
     
     var root = {};
+  
+    root.isLogged = function(){
+      var logged = Boolean($window.sessionStorage.getItem('go')); //str
+      return logged;
+    }
     
-    //root.go = false;
-    //root.cookies = [];
-
-    //is Logged
-    root.canGo = function(){
-      return  $cookies.get('go') ? true : false;
-    };
-    
-    
-    root.login = function(bit){
+    root.checkPin = function(bit){
       if(bit.charAt(150) === "i" && bit.charAt(12) === 'o'){
-        var cook = $cookies.get('go');
-        if(!cook){
-          $cookies.put('go', true);
-        }
         return true;
       }else{
         return false;
@@ -293,9 +292,9 @@
     
     
     root.logout = function(){
-      root.removeAllCookies();
-    };
-    
+      $window.sessionStorage.removeItem('go');
+      //root.removeAllCookies(); //not in use
+    }
     
     
     root.removeAllCookies = function(){
@@ -310,6 +309,38 @@
     
     //keep one line
     //put some watch?
+    
+    
+    root.isMobile = function(){
+      if(typeof window.orientation !== 'undefined'){
+        return true;
+      }
+    };
+    
+    
+    root.getBaseUrl = function(){
+      //1hardcde
+      
+      //2.
+      /*
+      if(window.location.pathname){
+        return window.location.origin+window.location.pathname;
+      }else{
+        return window.location.origin;
+      }
+      */
+      //3
+      return $location.$$absUrl.split('#')[0];
+      
+      //4 $window
+    };
+    
+    
+    root.getPathName = function(){
+      return window.location.pathname.split('#')[0]; //no need 
+      //return window.location.pathname; //ok
+    };    
+    
     
     
     return root;
