@@ -32,39 +32,47 @@ body{
         line-height: 20px; /* h - 2*padding*/
         margin-bottom: 8px;
       }
-      div.bench{
-        padding: 5px;
-        font-size: 8px;
-        color: white;
-        height:30px;
-        line-height: 20px; /* h - 2*padding*/
-        width:100%;
-        background:#9b59b6;
-      }
+
+div.bench{
+  padding: 5px;
+  font-size: 8px;
+  color: white;
+  height:30px;
+  line-height: 20px; /* h - 2*padding*/
+  width:100%;
+  background:#9b59b6;
+}
+
+h4.techs{
+  margin-bottom: 10px;
+  border-bottom:1px solid #34495e;
+}
+
+
       
-      @media only screen and (min-width : 360px){
+  @media only screen and (min-width : 360px){
         
-        .chart div{
-          font-size: 10px;
-        }
+    .chart div{
+      font-size: 10px;
+    }
         
-        div.bench{
-          font-size: 10px;
-        } 
+    div.bench{
+      font-size: 10px;
+    } 
          
-      }
+  }
       
-      @media only screen and (min-width : 480px){
+  @media only screen and (min-width : 480px){
         
-        .chart div{
-          font-size: 12px;
-        }
+    .chart div{
+      font-size: 12px;
+    }
         
-        div.bench{
-          font-size: 12px;
-        } 
+    div.bench{
+      font-size: 12px;
+    } 
          
-      }
+  }
 
 
 

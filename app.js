@@ -4,15 +4,13 @@
     
     window.onload = function(){
       
-      
-      /* fixes ng include issue + closure */
+      /* fixes ng include issue + creates closure */
       var preloader = function(){
         var stop = setInterval(function(){
           var text = angular.element(document).find('#lessIsMoreText');
           var view = angular.element(document).find('#viewWrapper')
           var wrapper = text.parent().parent();
           
-          /*
           if(text.length && view.length && wrapper.length){
             text.fadeIn(3000).delay(2000).fadeOut(1000);
             wrapper.delay(5000).fadeOut(2000, function(){
@@ -20,32 +18,10 @@
               clearInterval(stop)
             });
           }
-          */
-          
-          if(text.length && view.length && wrapper.length){
-            text.fadeIn(3).delay(2).fadeOut(1);
-            wrapper.delay(5).fadeOut(2, function(){
-              view.fadeIn(8);          
-              clearInterval(stop)
-            });
-          }
-          
-          
-          
-          
-          
-          
           
         }, 1000/60);
       };
       preloader();
-      
-      
-      
-      
-      
-      
-      
       
     }//end window.onload
     
